@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="https://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Covid Dashboard Login Page</title>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+	integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+	crossorigin="anonymous">
+<link th:href="@{css/style.css}" rel="stylesheet" />
+<link rel="icon" type="image/png" th:href="@{images/favicon.png}" />
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="loginSub">
+			<div class="card mb-3">
+				<div class="row no-gutters">
+					<div class="col-md-8 pl-3">
+						<div class="col-md-12 text-center text-info pt-3">
+							<h2>Covid19 Dashboard</h2>
+						</div>
+						<div class="row">
+							<img th:src="@{/images/tracker.png}" class="img-circle"
+								style="height: 40px;" />
+							<h4>Single view for all covid19 related numbers</h4>
+						</div>
+						<div class="row">
+							<img th:src="@{/images/activity.png}" class="img-circle"
+								style="height: 40px;" />
+							<h4>Helps to track your activities</h4>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="card-body">
+							<div class="card-wrapper">
+								<div class="card fat">
+									<div class="card-body">
+										<div th:if="${param.logout}">
+											<div class="alert alert-info">You have been logged out.</div>
+										</div>
+										<h4 class="card-title">Login</h4>
+										<form th:action="@{/login}" method="post">
+											<div class="form-group">
+												<label for="email">E-Mail Address</label> <input
+													id="username" class="form-control" name="username" value=""
+													required autofocus type="email">
+											</div>
+
+											<div class="form-group">
+												<label for="password">Password </label> <input id="password"
+													type="password" class="form-control" name="password"
+													required>
+											</div>
+
+											<div class="form-group m-0">
+												<button type="submit" class="btn btn-primary btn-block">
+													Login</button>
+											</div>
+											<div th:if="${param.error}">
+												<div class="alert alert-danger">Invalid email or
+													password.</div>
+											</div>
+											<div class="mt-4 text-center">
+												Don't have an account? <a href="register">Create One</a>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+		integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+		integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+		crossorigin="anonymous"></script>
+</body>
+</html>

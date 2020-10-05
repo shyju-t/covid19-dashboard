@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="https://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Covid Dashboard Login Page</title>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+	integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+	crossorigin="anonymous">
+<link th:href="@{css/style.css}" rel="stylesheet" />
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css" />
+<link rel="icon" type="image/png" th:href="@{images/favicon.png}" />
+<style>
+* {
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.div_hover_green:hover {
+	background-color: lightgreen;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.div_hover_red:hover {
+	background-color: #fc6767;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.div_hover_grey:hover {
+	background-color: #a19c9c;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.div_hover_blue:hover {
+	background-color: #afb0f5;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+table.dataTable tfoot th, table.dataTable tfoot td {
+	padding: 8px 10px;
+}
+</style>
+</head>
+
+<body>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<a class="navbar-brand" th:href="@{/home}">Covid19 Dashboard</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse"
+			data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
+			aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarNavDropdown">
+			<ul class="navbar-nav">
+				<li class="nav-item"><a class="nav-link" th:href="@{/home}">Home
+						<span class="sr-only">(current)</span>
+				</a></li>
+				<li class="nav-item active"><a class="nav-link" href="#">Temperature
+						Tracking</a></li>
+			</ul>
+		</div>
+		<div class="pull-right navbar-right mr-5">
+			<ul class="nav pull-right">
+				<li class="dropdown"><a href="#" class="dropdown-toggle"
+					data-toggle="dropdown" th:inline="text">Welcome,
+						[[${#httpServletRequest.remoteUser}]] <b class="caret"></b>
+				</a>
+					<ul class="dropdown-menu">
+						<form th:action="@{/logout}" method="post" class="dropdown-item">
+							<input type="submit" value="Sign Out" />
+						</form>
+					</ul></li>
+			</ul>
+		</div>
+
+	</nav>
+	<div class="container-fluid">
+
+		<div class="col-md-8 offset-md-2">
+			<div class="col-md-12 text-center text-info pt-3">
+				<h2>Track your Daily temperature</h2>
+			</div>
+			<div class="mt-5">
+				<div th:if="${param.success}">
+					<div class="alert alert-info">Temperature reading
+						successfully saved</div>
+				</div>
+				<form th:action="@{/saveTemperatureReading}"
+					th:object="${tempDetail}" method="post">
+
+					<p class="error-message" th:if="${#fields.hasGlobalErrors()}"
+						th:each="error : ${#fields.errors('global')}" th:text="${error}">Validation
+						error</p>
+					<div class="row ml-2">
+						<div class="form-group"
+							th:classappend="${#fields.hasErrors('temperature')}? 'has-error':''">
+							<label for="temperature">Temperature</label> <input
+								id="temperature" class="form-control" name="temperature"
+								value="" th:field="*{temperature}" required autofocus />
+							<p class="alert-danger"
+								th:each="error: ${#fields.errors('temperature')}"
+								th:text="${error}">Validation error</p>
+						</div>
+						<div class="form-group ml-3"
+							th:classappend="${#fields.hasErrors('timestamp')}? 'has-error':''">
+							<label for="timestamp">Temperature Reading Time</label> <input
+								id="timestamp" class="form-control" name="timestamp" value=""
+								th:field="*{timestamp}" required autofocus type="datetime-local">
+							<p class="alert-danger"
+								th:each="error: ${#fields.errors('timestamp')}"
+								th:text="${error}">Validation error</p>
+						</div>
+
+						<div class="form-group m-0 ml-3 pt-4">
+							<button type="submit" class="btn btn-primary btn-block">
+								Save</button>
+						</div>
+					</div>
+
+
+
+				</form>
+			</div>
+
+			<div class="col-md-12 text-center text-info pt-1 pb-3">
+				<h3>Last Readings</h3>
+			</div>
+			<div class="pb-5">
+				<table class="table table-striped" id="temperatureTable">
+					<thead class="thead-dark">
+						<tr>
+							<th scope="col">Time</th>
+							<th scope="col">Temperature</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="tempReading: ${tempReadings}">
+							<td th:text="${tempReading.timestamp}" />
+							<td th:text="${tempReading.temperature}" />
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+		integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+		integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/8.0.4/highcharts.min.js"></script>
+	<script
+		src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js"></script>
+
+	<script>
+		$('#temperatureTable').DataTable({
+	        "pageLength": 50
+	    });
+    </script>
+</body>
+
+</html>

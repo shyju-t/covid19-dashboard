@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="https://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Covid Dashboard Login Page</title>
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+	integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+	crossorigin="anonymous">
+<link th:href="@{css/style.css}" rel="stylesheet" />
+<link rel="stylesheet"
+	href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css" />
+<link rel="icon" type="image/png" th:href="@{images/favicon.png}" />
+<style>
+* {
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.div_hover_green:hover {
+	background-color: lightgreen;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.div_hover_red:hover {
+	background-color: #fc6767;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.div_hover_grey:hover {
+	background-color: #a19c9c;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.div_hover_blue:hover {
+	background-color: #afb0f5;
+	border-radius: 5px;
+	cursor: pointer;
+}
+table.dataTable tfoot th, table.dataTable tfoot td {
+                 padding: 8px 10px;
+        }
+</style>
+</head>
+
+<body>
+	<nav class="navbar navbar-expand-lg navbar-light bg-light">
+		<a class="navbar-brand" href="#">Covid19 Dashboard</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse"
+			data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
+			aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarNavDropdown">
+			<ul class="navbar-nav">
+				<li class="nav-item active"><a class="nav-link" href="#">Home
+						<span class="sr-only">(current)</span>
+				</a></li>
+				<li class="nav-item"><a class="nav-link" th:href="@{/temperatureTracker}">Temperature
+						Tracking</a></li>
+			</ul>
+		</div>
+		<div class="pull-right navbar-right mr-5">
+			<ul class="nav pull-right">
+				<li class="dropdown"><a href="#" class="dropdown-toggle"
+					data-toggle="dropdown" th:inline="text">Welcome,
+						[[${#httpServletRequest.remoteUser}]] <b class="caret"></b>
+				</a>
+					<ul class="dropdown-menu">
+						<form th:action="@{/logout}" method="post" class="dropdown-item">
+							<input type="submit" value="Sign Out" />
+						</form>
+					</ul></li>
+			</ul>
+		</div>
+
+	</nav>
+	<div class="container-fluid">
+
+		<div class="col-md-8 offset-md-2">
+		<div class="col-md-12 text-center text-info pt-3">
+                <h2>Cumulative Summary of Covid19 Cases in India</h2>
+            </div>
+			<div class="mt-5">
+				<div class="col-md-6 offset-md-3">
+					<div class="row" style="height: 75px;">
+						<div class="col-md-3 text-danger h-100 div_hover_red">
+							<div class="h-25 d-flex justify-content-center mt-1">
+								Confirmed</div>
+							<div id="confimedCount"
+								class="h-75 d-flex justify-content-center font-weight-bold pt-2">
+							</div>
+						</div>
+						<div class="col-md-3 text-info h-100 div_hover_blue">
+							<div class="h-25 d-flex justify-content-center mt-1">Active</div>
+							<div id="activeCount"
+								class="h-75 d-flex justify-content-center font-weight-bold pt-2">
+							</div>
+						</div>
+						<div class="col-md-3 text-success h-100 div_hover_green">
+							<div class="h-25 d-flex justify-content-center mt-1">Recovered</div>
+							<div id="recovedCount"
+								class="h-75 d-flex justify-content-center font-weight-bold pt-2">
+							</div>
+						</div>
+						<div class="col-md-3 text-muted h-100 div_hover_grey">
+							<div class="h-25 d-flex justify-content-center mt-1">Deceased</div>
+							<div id="deceasedCount"
+								class="h-75 d-flex justify-content-center font-weight-bold pt-2">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div style="height: 400px;" class="row pt-3 pb-3">
+				<canvas id="myChart" class="h-100"></canvas>
+			</div>
+			<div class="col-md-12 text-center text-info pt-3 pb-3">
+				<h3>Statewise Count</h3>
+			</div>
+			<div class="pb-5">
+				<table class="table table-striped" id="stateTable">
+					<thead class="thead-dark">
+						<tr>
+							<th scope="col">State</th>
+							<th scope="col">Active Cases</th>
+							<th scope="col">Confirmed Cases</th>
+							<th scope="col">Deaths</th>
+							<th scope="col">Recovered</th>
+						</tr>
+					</thead>
+					<tfoot id="table-foot"></tfoot>
+					<tbody id="table-content">
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+		integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+		integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+		crossorigin="anonymous"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/8.0.4/highcharts.min.js"></script>
+	<script
+		src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js"></script>
+
+	<script>
+        createChart();
+        async function createChart() {
+            var { totalConfirmed, totalRecovered, statewiseReport } = await getData();
+            populateStateReportTable(statewiseReport);
+            populateTotal(statewiseReport[0]);
+
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: totalConfirmed.map(x => x[0].getFullYear() + '-' + (x[0].getMonth() + 1) + '-' + x[0].getDate()),
+                    datasets: [{
+                        label: '# of Confirmed Cases',
+                        data: totalConfirmed.map(x => x[1]),
+                        borderWidth: 2,
+                        borderColor: 'rgba(255,99,132,1)',
+                        fill: false
+                    },
+                    {
+                        label: '# of Recovered Cases',
+                        data: totalRecovered.map(x => x[1]),
+                        borderWidth: 2,
+                        borderColor: 'rgba(0,255,132,1)',
+                        fill: false
+                    }
+                    ]
+                },
+                options: {
+                    elements: {
+                        point: {
+                            radius: 0.2
+                        }
+                    }, scales: {
+                        xAxes: [{
+                            gridLines: {
+                                lineWidth: 0
+                            }
+                        }],
+                        yAxes: [{
+                            gridLines: {
+                                lineWidth: 0
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+
+        async function getData() {
+            const response = await fetch('https://api.covid19india.org/data.json');
+            const myJson = await response.json();
+            return parseJson(myJson);
+        }
+
+        function parseJson(result) {
+
+            var dailyConfirmed = [];
+            var dailyDeceased = [];
+            var dailyRecovered = [];
+
+            var totalConfirmed = [];
+            var totalDeceased = [];
+            var totalRecovered = [];
+
+            var cts = result.cases_time_series;
+
+
+            for (x in cts) {
+
+                var date_i = new Date(cts[x].date + '2020');
+                var date_str = date_i.getFullYear() + '-' + (date_i.getMonth() + 1) + '-' + date_i.getDate();
+                var today = new Date();
+                var today_str = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+
+                if (date_str != today_str) {
+                    dailyConfirmed.push([date_i, parseInt(cts[x].dailyconfirmed)]);
+                    dailyDeceased.push([date_i, parseInt(cts[x].dailydeceased)]);
+                    dailyRecovered.push([date_i, parseInt(cts[x].dailyrecovered)]);
+                    totalConfirmed.push([date_i, parseInt(cts[x].totalconfirmed)]);
+                    totalDeceased.push([date_i, parseInt(cts[x].totaldeceased)]);
+                    totalRecovered.push([date_i, parseInt(cts[x].totalrecovered)]);
+                }
+            }
+
+            var statewise = result.statewise;
+            var statewiseReport = [];
+            result.statewise.map(x => statewiseReport.push([x.state, x.active, x.confirmed, x.deaths, x.recovered]));
+            return { totalConfirmed, totalRecovered, statewiseReport };
+        }
+        function populateStateReportTable(statewiseReport) {
+            for (let i = 0; i < statewiseReport.length; i++) {
+                if (statewiseReport[i][0] == 'Total') {
+
+                    let row = $('<tr>');
+                    row.append($('<td>').html(statewiseReport[i][0]));
+                    row.append($('<td>').html(statewiseReport[i][1]));
+                    row.append($('<td>').html(statewiseReport[i][2]));
+                    row.append($('<td>').html(statewiseReport[i][3]));
+                    row.append($('<td>').html(statewiseReport[i][4]));
+                    $('#table-foot').append(row);
+                } else {
+                    let row = $('<tr>');
+                    row.append($('<td>').html(statewiseReport[i][0]));
+                    row.append($('<td>').html(statewiseReport[i][1]));
+                    row.append($('<td>').html(statewiseReport[i][2]));
+                    row.append($('<td>').html(statewiseReport[i][3]));
+                    row.append($('<td>').html(statewiseReport[i][4]));
+                    $('#table-content').append(row);
+                }
+            }
+            $('#stateTable').DataTable({
+                "pageLength": 50
+            });
+        }
+
+        function populateTotal(total) {
+            $('#activeCount').html(total[1]);
+            $('#confimedCount').html(total[2]);
+            $('#deceasedCount').html(total[3]);
+            $('#recovedCount').html(total[4]);
+        }
+
+    </script>
+</body>
+
+</html>

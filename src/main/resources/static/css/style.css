@@ -1,0 +1,15 @@
+/*body{
+		        background: url('../images/bg.jpg');
+		        background-size: cover;
+		    }*/
+		    
+.loginSub{
+  -ms-flex-align: center;
+  -ms-flex-pack: center;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
