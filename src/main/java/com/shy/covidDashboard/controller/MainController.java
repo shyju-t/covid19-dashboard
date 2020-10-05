@@ -40,7 +40,7 @@ public class MainController {
 		return "register";
 	}
 
-	@RequestMapping(path = "/saveRegisteration", method = RequestMethod.POST)
+	@RequestMapping(path = "/saveRegistration", method = RequestMethod.POST)
 	public String saveRegisteration(@Valid @ModelAttribute User user, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return "register";
@@ -71,7 +71,6 @@ public class MainController {
 	
 	@RequestMapping(path="/saveTemperatureReading", method = RequestMethod.POST)
 	public String saveTemperatureReading(@ModelAttribute TemperatureDetail tempDetail,Principal principal) {
-		System.out.println(tempDetail);
 		userService.addTemperatureReading(principal, tempDetail);
 		return "redirect:/temperatureTracker?success";
 	}

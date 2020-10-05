@@ -9,7 +9,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.shy.covidDashboard.repository.UserRepository;
 
 @SpringBootApplication
-@EnableJpaRepositories(basePackageClasses = UserRepository.class)
 public class CovidDashboardApplication {
 
 	public static void main(String[] args) {
